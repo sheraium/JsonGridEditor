@@ -1,5 +1,4 @@
-﻿using JsonGridEditor.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace JsonGridEditor.Views
 {
@@ -31,6 +31,10 @@ namespace JsonGridEditor.Views
                 var tableColumn = new List<string>();
 
                 using var reader = new StreamReader(fileName);
+                var rawData = await reader.ReadToEndAsync();
+                TextBox1.Text = rawData;
+
+                return;
                 var head = await reader.ReadLineAsync();
                 tableColumn.AddRange(head.Split(','));
                 foreach (var s in tableColumn)
@@ -68,7 +72,22 @@ namespace JsonGridEditor.Views
         {
             try
             {
-                var fileName = FileDialog.GetSaveFileName();
+                var fileName1 = string.Empty;
+                var saveFileDialog = new SaveFileDialog();
+                saveFileDialog.DefaultExt = ".json";
+                saveFileDialog.AddExtension = true;
+                saveFileDialog.Filter = "Json file(*.json)|*.json";
+                //saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                saveFileDialog.OverwritePrompt = true;
+                saveFileDialog.CheckPathExists = true;
+                saveFileDialog.FileName = $"{DateTime.Now.Date:yyyyMMdd}";
+                var result = saveFileDialog.ShowDialog();
+                if (result.HasValue && result.Value)
+                {
+                    fileName1 = saveFileDialog.FileName;
+                }
+
+                var fileName = fileName1;
                 if (string.IsNullOrEmpty(fileName) == false)
                 {
                     _fileName = fileName;

@@ -1,5 +1,4 @@
-﻿using JsonGridEditor.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace JsonGridEditor.Views
 {
@@ -68,7 +68,21 @@ namespace JsonGridEditor.Views
         {
             try
             {
-                var fileName = FileDialog.GetSaveFileName();
+                var fileName = string.Empty;
+                var saveFileDialog = new SaveFileDialog();
+                saveFileDialog.DefaultExt = ".csv";
+                saveFileDialog.AddExtension = true;
+                saveFileDialog.Filter = "Csv file(*.csv)|*.csv";
+                //saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                saveFileDialog.OverwritePrompt = true;
+                saveFileDialog.CheckPathExists = true;
+                saveFileDialog.FileName = $"{DateTime.Now.Date:yyyyMMdd}";
+                var result = saveFileDialog.ShowDialog();
+                if (result.HasValue && result.Value)
+                {
+                    fileName = saveFileDialog.FileName;
+                }
+
                 if (string.IsNullOrEmpty(fileName) == false)
                 {
                     _fileName = fileName;

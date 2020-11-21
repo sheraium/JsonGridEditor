@@ -2,7 +2,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using FileDialog = JsonGridEditor.Extensions.FileDialog;
+using Microsoft.Win32;
 
 namespace JsonGridEditor
 {
@@ -22,7 +22,23 @@ namespace JsonGridEditor
         {
             try
             {
-                var fileName = FileDialog.GetOpenFileName();
+                var dialog = new OpenFileDialog();
+                //dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                dialog.Filter = "Csv檔案(*.csv)|*.csv|其他檔案|*.*";
+                dialog.FilterIndex = 1;
+                dialog.Title = "開啟檔案";
+                dialog.RestoreDirectory = true;
+                dialog.Multiselect = false;
+
+                var result = dialog.ShowDialog();
+
+                var fileName1 = string.Empty;
+                if (result.HasValue && result.Value)
+                {
+                    fileName1 = dialog.FileName;
+                }
+
+                var fileName = fileName1;
 
                 if (string.IsNullOrEmpty(fileName) == false)
                 {
@@ -43,7 +59,21 @@ namespace JsonGridEditor
         {
             try
             {
-                var fileName = FileDialog.GetOpenFileName();
+                var dialog = new OpenFileDialog();
+                //dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                dialog.Filter = "Json file(*.json)|*.json|Csv file(*.csv)|*.csv|other files|*.*";
+                dialog.FilterIndex = 1;
+                dialog.Title = "開啟檔案";
+                dialog.RestoreDirectory = true;
+                dialog.Multiselect = false;
+
+                var result = dialog.ShowDialog();
+
+                var fileName = string.Empty;
+                if (result.HasValue && result.Value)
+                {
+                    fileName = dialog.FileName;
+                }
 
                 if (string.IsNullOrEmpty(fileName) == false)
                 {
