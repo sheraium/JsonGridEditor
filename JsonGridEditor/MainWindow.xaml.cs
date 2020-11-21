@@ -18,7 +18,7 @@ namespace JsonGridEditor
             InitializeComponent();
         }
 
-        private void ButtonOpenCsv_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonOpenCsv_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace JsonGridEditor
                     _editorPage = new CsvEditorPage();
                     var editor = (IEditor)_editorPage;
 
-                    editor.LoadFile(fileName);
+                    await editor.LoadAsync(fileName);
                     ContentFrame.Content = _editorPage;
                 }
             }
@@ -37,40 +37,6 @@ namespace JsonGridEditor
             {
                 MessageBox.Show(ex.Message);
             }
-        }
-
-        private void ButtonSave_OnClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (_editorPage is IEditor editor)
-                {
-                    editor.Save();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void ButtonSaveAs_OnClick(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (_editorPage is IEditor editor)
-                {
-                    editor.SaveAs();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
-        {
         }
 
         private void ButtonOpenJson_OnClick(object sender, RoutedEventArgs e)
@@ -84,7 +50,7 @@ namespace JsonGridEditor
                     _editorPage = new JsonEditorPage();
                     var editor = (IEditor)_editorPage;
 
-                    editor.LoadFile(fileName);
+                    editor.LoadAsync(fileName);
                     ContentFrame.Content = _editorPage;
                 }
             }
@@ -92,6 +58,40 @@ namespace JsonGridEditor
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private async void ButtonSave_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_editorPage is IEditor editor)
+                {
+                    await editor.SaveAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private async void ButtonSaveAs_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_editorPage is IEditor editor)
+                {
+                    await editor.SaveAsAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

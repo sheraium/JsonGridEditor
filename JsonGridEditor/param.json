@@ -1,0 +1,374 @@
+{
+  "Guid": "ab648f5f-a38d-4bd9-9842-fa5d159b7cdb",
+  "Id": "STK100",
+  "IsDoubleDeep": false,
+  "Cranes": [
+    {
+      "Guid": "2c491bcd-785f-4a59-8bdf-046c90b444ba",
+      "Id": "STK100C1",
+      "CraneNo": 1,
+      "Enable": true,
+      "Remark": null,
+      "MaxSpeed": {
+        "Travel": 20,
+        "Lift": 20,
+        "Fork": 20,
+        "Rotate": 20
+      },
+      "Locations": [
+        {
+          "Guid": "de55ebb6-88b6-4a7d-a4ab-af48770d1d33",
+          "Id": "STK100C1",
+          "Enable": true,
+          "Carrier": null
+        }
+      ]
+    }
+  ],
+  "Zones": [
+    {
+      "Guid": "cacf516d-c099-42f7-b0fe-333b1b5cd2b2",
+      "Id": "ZONE1",
+      "IsHandOff": false,
+      "Shelves": [
+        {
+          "Guid": "d3449e43-8d86-4260-933c-4e7054927246",
+          "Id": "0100101",
+          "Type": "Normal",
+          "Bank": 1,
+          "Bay": 1,
+          "Level": 1,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "dcdbb718-8aef-41eb-b199-c030483fe050",
+              "Id": "0100101",
+              "Enable": true,
+              "Carrier": {
+                "Guid": "43bfe1fc-0aae-4b81-befa-77ae9ece3c82",
+                "Id": "aaa",
+                "InstallTime": "2020-11-12T14:19:38.0517112+08:00",
+                "Type": "Normal",
+                "State": 0,
+                "Remark": null
+              }
+            }
+          ]
+        },
+        {
+          "Guid": "5ac79016-36f9-4638-96e5-2f6c73f71db4",
+          "Id": "0100102",
+          "Type": "Normal",
+          "Bank": 1,
+          "Bay": 1,
+          "Level": 2,
+          "Enable": true,
+          "Remark": "",
+          "Locations": [
+            {
+              "Guid": "29124bd4-10c6-403e-a35d-3bf50809294e",
+              "Id": "0100102",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "3f4a0b96-7fa4-49f3-be4d-57988a809e6a",
+          "Id": "0100103",
+          "Type": "Normal",
+          "Bank": 1,
+          "Bay": 1,
+          "Level": 3,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "9ca73395-d27e-43f0-bd04-9fbfa46bf92e",
+              "Id": "0100103",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "7ff6a601-0e2c-405d-a274-10adcd74d911",
+          "Id": "0100202",
+          "Type": "Normal",
+          "Bank": 1,
+          "Bay": 2,
+          "Level": 2,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "9396b6c4-f22e-44d2-bc23-d4869f40a9a1",
+              "Id": "0100202",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "c65cc0be-fff9-4d63-ac32-3ce207e2cf3a",
+          "Id": "0100203",
+          "Type": "Normal",
+          "Bank": 1,
+          "Bay": 2,
+          "Level": 3,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "e41e2e91-5177-4b92-8c30-217990ca0c4f",
+              "Id": "0100203",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "76f1181c-4d88-41d3-b7c1-05af7fca0f83",
+          "Id": "0100301",
+          "Type": "Normal",
+          "Bank": 1,
+          "Bay": 3,
+          "Level": 1,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "8b800dc2-f236-44f1-9605-83b06a5dd3d5",
+              "Id": "0100301",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "304cb0d7-ddd2-4b47-9476-a24810b7d286",
+          "Id": "0100302",
+          "Type": "Normal",
+          "Bank": 1,
+          "Bay": 3,
+          "Level": 2,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "8afbcfc5-27a5-4297-a401-77b21a9f1982",
+              "Id": "0100302",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "6942f617-3ecc-4e77-b65a-4e4f44e57411",
+          "Id": "0100303",
+          "Type": "Normal",
+          "Bank": 1,
+          "Bay": 3,
+          "Level": 3,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "56f6e912-ad37-44b6-b92e-30b8f3a59e02",
+              "Id": "0100303",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "38bcaa8d-092b-4a3b-b241-632ac507e91f",
+          "Id": "0200102",
+          "Type": "Normal",
+          "Bank": 2,
+          "Bay": 1,
+          "Level": 2,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "78106a68-e22d-407b-b0a6-dbb1618d7ab0",
+              "Id": "0200102",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "70940e55-c525-41b4-9dff-c49f7cec592c",
+          "Id": "0200103",
+          "Type": "Normal",
+          "Bank": 2,
+          "Bay": 1,
+          "Level": 3,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "721653ff-b217-4e44-b859-3d9394b5627e",
+              "Id": "0200103",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "d3cf00d5-4c1f-48d1-9ae0-55705617c694",
+          "Id": "0200201",
+          "Type": "Normal",
+          "Bank": 2,
+          "Bay": 2,
+          "Level": 1,
+          "Enable": true,
+          "Remark": "",
+          "Locations": [
+            {
+              "Guid": "74fcd8db-1e7a-49ec-b76f-0616c76a2655",
+              "Id": "0200201",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "44eb8f44-d73c-4dba-af79-01fa32ae0011",
+          "Id": "0200202",
+          "Type": "Normal",
+          "Bank": 2,
+          "Bay": 2,
+          "Level": 2,
+          "Enable": true,
+          "Remark": "",
+          "Locations": [
+            {
+              "Guid": "19bcc153-e2b1-4983-a333-f04d973a7111",
+              "Id": "0200202",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "d5159156-89f5-47e6-a69b-55ed244233d9",
+          "Id": "0200203",
+          "Type": "Normal",
+          "Bank": 2,
+          "Bay": 2,
+          "Level": 3,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "b4ee81b7-76bf-407b-a663-f48a62c717b4",
+              "Id": "0200203",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "1fbdaa0e-6d6e-4de8-90ed-7c66cc7bfc10",
+          "Id": "0200301",
+          "Type": "Normal",
+          "Bank": 2,
+          "Bay": 3,
+          "Level": 1,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "e7eb6d50-dfe3-4c28-9ea4-f33189f2c980",
+              "Id": "0200301",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "217c3a9a-cd1b-412b-b5c0-4ac1ecc5ef57",
+          "Id": "0200302",
+          "Type": "Normal",
+          "Bank": 2,
+          "Bay": 3,
+          "Level": 2,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "562fe149-79ee-4071-afb9-bb0b727a4737",
+              "Id": "0200302",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        },
+        {
+          "Guid": "a22e0733-e441-4d1f-992c-64a99c401799",
+          "Id": "0200303",
+          "Type": "Normal",
+          "Bank": 2,
+          "Bay": 3,
+          "Level": 3,
+          "Enable": true,
+          "Remark": null,
+          "Locations": [
+            {
+              "Guid": "11020b07-7756-4a31-a4a4-ea2d948527f4",
+              "Id": "0200303",
+              "Enable": true,
+              "Carrier": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "IOPorts": [
+    {
+      "Guid": "a0f445fc-8a25-46d8-8ecf-724e4b839c17",
+      "Id": "STK100P01",
+      "No": 2,
+      "TypeNo": 1,
+      "DisplayBank": 2,
+      "DisplayBay": 1,
+      "DisplayLevel": 1,
+      "Enable": true,
+      "Remark": null,
+      "Locations": [
+        {
+          "Guid": "ed81f658-0ffd-499b-9164-92d89c7488f5",
+          "Id": "STK100P01",
+          "Enable": true,
+          "Carrier": null
+        }
+      ]
+    }
+  ],
+  "EQPorts": [
+    {
+      "Guid": "f0e37e26-311f-400a-9adf-db48b94f8248",
+      "Id": "STK100P02",
+      "No": 1,
+      "TypeNo": 1,
+      "DisplayBank": 1,
+      "DisplayBay": 2,
+      "DisplayLevel": 1,
+      "Enable": true,
+      "Remark": null,
+      "Locations": [
+        {
+          "Guid": "3545162c-d3e4-4cb0-950a-73bc29e056b3",
+          "Id": "STK100P02",
+          "Enable": true,
+          "Carrier": null
+        }
+      ]
+    }
+  ]
+}

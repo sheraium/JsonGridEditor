@@ -1,11 +1,13 @@
-﻿namespace JsonGridEditor.Views
+﻿using System.Threading.Tasks;
+
+namespace JsonGridEditor.Views
 {
     public interface IEditor
     {
-        void LoadFile(string fileName);
+        Task LoadAsync(string fileName);
 
-        void Save();
+        Task SaveAsAsync();
 
-        void SaveAs();
+        Task SaveAsync();
     }
 }

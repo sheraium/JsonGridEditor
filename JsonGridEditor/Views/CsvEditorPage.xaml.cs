@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -21,7 +22,7 @@ namespace JsonGridEditor.Views
             InitializeComponent();
         }
 
-        public void LoadFile(string fileName)
+        public async Task LoadAsync(string fileName)
         {
             try
             {
@@ -30,7 +31,7 @@ namespace JsonGridEditor.Views
                 var tableColumn = new List<string>();
 
                 using var reader = new StreamReader(fileName);
-                var head = reader.ReadLine();
+                var head = await reader.ReadLineAsync();
                 tableColumn.AddRange(head.Split(','));
                 foreach (var s in tableColumn)
                 {
@@ -39,7 +40,7 @@ namespace JsonGridEditor.Views
 
                 while (!reader.EndOfStream)
                 {
-                    var line = reader.ReadLine();
+                    var line = await reader.ReadLineAsync();
                     var values = line.Split(',').ToList();
 
                     var dataRow = dataTable.NewRow();
@@ -63,44 +64,7 @@ namespace JsonGridEditor.Views
             }
         }
 
-        public void Save()
-        {
-            try
-            {
-                var dataView = DataGrid1.ItemsSource as DataView;
-                var dataTable = dataView?.ToTable();
-                if (_fileName == null || dataTable == null) return;
-
-                using (var stream = new StreamWriter(_fileName))
-                {
-                    var columns = new List<string>();
-                    foreach (DataColumn column in dataTable.Columns)
-                    {
-                        var caption = column.Caption;
-                        columns.Add(caption);
-                    }
-
-                    stream.WriteLine(string.Join(",", columns));
-
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        var values = new List<string>();
-                        foreach (var column in columns)
-                        {
-                            values.Add(row[column].ToString());
-                        }
-                        stream.WriteLine(string.Join(",", values));
-                        values.Clear();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        public void SaveAs()
+        public Task SaveAsAsync()
         {
             try
             {
@@ -108,7 +72,43 @@ namespace JsonGridEditor.Views
                 if (string.IsNullOrEmpty(fileName) == false)
                 {
                     _fileName = fileName;
-                    Save();
+                    return SaveAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            return Task.CompletedTask;
+        }
+
+        public async Task SaveAsync()
+        {
+            try
+            {
+                var dataView = DataGrid1.ItemsSource as DataView;
+                var dataTable = dataView?.ToTable();
+                if (_fileName == null || dataTable == null) return;
+
+                using var stream = new StreamWriter(_fileName);
+                var columns = new List<string>();
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    var caption = column.Caption;
+                    columns.Add(caption);
+                }
+
+                await stream.WriteLineAsync(string.Join(",", columns));
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    var values = new List<string>();
+                    foreach (var column in columns)
+                    {
+                        values.Add(row[column].ToString());
+                    }
+                    await stream.WriteLineAsync(string.Join(",", values));
+                    values.Clear();
                 }
             }
             catch (Exception ex)

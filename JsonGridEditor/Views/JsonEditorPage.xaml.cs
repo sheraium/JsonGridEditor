@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -21,7 +22,7 @@ namespace JsonGridEditor.Views
             InitializeComponent();
         }
 
-        public void LoadFile(string fileName)
+        public async Task LoadAsync(string fileName)
         {
             try
             {
@@ -30,7 +31,7 @@ namespace JsonGridEditor.Views
                 var tableColumn = new List<string>();
 
                 using var reader = new StreamReader(fileName);
-                var head = reader.ReadLine();
+                var head = await reader.ReadLineAsync();
                 tableColumn.AddRange(head.Split(','));
                 foreach (var s in tableColumn)
                 {
@@ -39,7 +40,7 @@ namespace JsonGridEditor.Views
 
                 while (!reader.EndOfStream)
                 {
-                    var line = reader.ReadLine();
+                    var line = await reader.ReadLineAsync();
                     var values = line.Split(',').ToList();
 
                     var dataRow = dataTable.NewRow();
@@ -63,7 +64,25 @@ namespace JsonGridEditor.Views
             }
         }
 
-        public void Save()
+        public Task SaveAsAsync()
+        {
+            try
+            {
+                var fileName = FileDialog.GetSaveFileName();
+                if (string.IsNullOrEmpty(fileName) == false)
+                {
+                    _fileName = fileName;
+                    return SaveAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            return Task.CompletedTask;
+        }
+
+        public async Task SaveAsync()
         {
             try
             {
@@ -80,7 +99,7 @@ namespace JsonGridEditor.Views
                         columns.Add(caption);
                     }
 
-                    stream.WriteLine(string.Join(",", columns));
+                    await stream.WriteLineAsync(string.Join(",", columns));
 
                     foreach (DataRow row in dataTable.Rows)
                     {
@@ -89,26 +108,9 @@ namespace JsonGridEditor.Views
                         {
                             values.Add(row[column].ToString());
                         }
-                        stream.WriteLine(string.Join(",", values));
+                        await stream.WriteLineAsync(string.Join(",", values));
                         values.Clear();
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        public void SaveAs()
-        {
-            try
-            {
-                var fileName = FileDialog.GetSaveFileName();
-                if (string.IsNullOrEmpty(fileName) == false)
-                {
-                    _fileName = fileName;
-                    Save();
                 }
             }
             catch (Exception ex)
