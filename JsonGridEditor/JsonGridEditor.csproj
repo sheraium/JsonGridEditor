@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Views\CsvEditorPage - Copy.xaml.cs">
       <SubType>Code</SubType>
       <DependentUpon>CsvEditorPage.xaml.cs</DependentUpon>

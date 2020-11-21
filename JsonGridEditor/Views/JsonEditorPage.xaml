@@ -4,11 +4,45 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:JsonGridEditor.Views"
+      xmlns:jlinq="clr-namespace:Newtonsoft.Json.Linq;assembly=Newtonsoft.Json"
+      xmlns:extensions="clr-namespace:JsonGridEditor.Extensions"
       mc:Ignorable="d"
       d:DesignHeight="450" d:DesignWidth="800"
       FontSize="16"
       Loaded="JsonEditorPage_OnLoaded"
       Title="CsvEditorPage">
+    <Page.Resources>
+        <extensions:MethodToValueConverter x:Key="MethodToValueConverter" />
+        <HierarchicalDataTemplate DataType="{x:Type jlinq:JArray}"
+                                  ItemsSource="{Binding Converter={StaticResource MethodToValueConverter}, ConverterParameter='Children'}">
+            <TextBlock Text="Array" />
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type jlinq:JProperty}"
+                                  ItemsSource="{Binding Converter={StaticResource MethodToValueConverter}, ConverterParameter='Children'}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Property name: " />
+                <TextBlock Text="{Binding Path=Name, Mode=OneWay}" />
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type jlinq:JObject}"
+                                  ItemsSource="{Binding Converter={StaticResource MethodToValueConverter}, ConverterParameter='Children'}">
+            <TextBlock Text="Object" />
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type jlinq:JConstructor}"
+                                  ItemsSource="{Binding Converter={StaticResource MethodToValueConverter}, ConverterParameter='Children'}">
+            <TextBlock Text="Constructor" />
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type jlinq:JRaw}"
+                                  ItemsSource="{Binding Converter={StaticResource MethodToValueConverter}, ConverterParameter='Children'}">
+            <TextBlock Text="Raw" />
+        </HierarchicalDataTemplate>
+        <DataTemplate DataType="{x:Type jlinq:JValue}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Value: " />
+                <TextBox Text="{Binding Path=Value, Mode=TwoWay}" />
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -17,15 +51,32 @@
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <TextBox x:Name="TextBox1"
-                     TextWrapping="NoWrap"
-                     AcceptsReturn="True"
-                     HorizontalScrollBarVisibility="Auto"
-                     VerticalScrollBarVisibility="Auto" />
+            <TreeView x:Name="TreeView1">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="True" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+            </TreeView>
         </Grid>
-        <GridSplitter Grid.Column="1"  Width="5" Background="LightSeaGreen" />
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="LightSeaGreen" />
         <Grid Grid.Column="2">
-            <DataGrid x:Name="DataGrid1"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Edit" Click="ButtonEdit_OnClick"
+                    Margin="5"
+                    HorizontalAlignment="Left"
+                    Width="150" Height="30" />
+                <Button Content="Set Data" Click="ButtonSetData_OnClick"
+                    Margin="5"
+                    HorizontalAlignment="Left"
+                    Width="150" Height="30" />
+            </StackPanel>
+            <DataGrid x:Name="DataGrid1" Grid.Row="1"
+                      VerticalAlignment="Top"
                       ScrollViewer.CanContentScroll="True"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto" />
