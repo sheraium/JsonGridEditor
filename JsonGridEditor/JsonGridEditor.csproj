@@ -7,9 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Update="Views\CsvEditorPage - Copy.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>CsvEditorPage.xaml.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="param.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\JsonEditorPage.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

@@ -1,13 +1,8 @@
-﻿using Microsoft.Win32;
+﻿using JsonGridEditor.Views;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Diagnostics;
-using System.Dynamic;
-using System.IO;
-using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using FileDialog = JsonGridEditor.Extensions.FileDialog;
 
 namespace JsonGridEditor
 {
@@ -16,59 +11,26 @@ namespace JsonGridEditor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string _fileName = string.Empty;
+        private Page _editorPage;
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void ButtonOpen_OnClick(object sender, RoutedEventArgs e)
+        private void ButtonOpenCsv_OnClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                var dialog = new OpenFileDialog();
-                //dialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                dialog.Filter = "Csv檔案(*.csv)|*.csv|其他檔案|*.*";
-                dialog.FilterIndex = 1;
-                dialog.Title = "開啟檔案";
-                dialog.RestoreDirectory = true;
-                dialog.Multiselect = false;
+                var fileName = FileDialog.GetOpenFileName();
 
-                var result = dialog.ShowDialog();
-                if (result.HasValue && result.Value)
+                if (string.IsNullOrEmpty(fileName) == false)
                 {
-                    _fileName = dialog.FileName;
-                    var dataTable = new DataTable();
-                    var tableColumn = new List<string>();
+                    _editorPage = new CsvEditorPage();
+                    var editor = (IEditor)_editorPage;
 
-                    using var reader = new StreamReader(_fileName);
-                    var head = reader.ReadLine();
-                    tableColumn.AddRange(head.Split(','));
-                    foreach (var s in tableColumn)
-                    {
-                        dataTable.Columns.Add(s);
-                    }
-
-                    while (!reader.EndOfStream)
-                    {
-                        var line = reader.ReadLine();
-                        var values = line.Split(',').ToList();
-
-                        var dataRow = dataTable.NewRow();
-                        var columnEnumerator = tableColumn.GetEnumerator();
-                        var valueEnumerator = values.GetEnumerator();
-                        while (columnEnumerator.MoveNext() && valueEnumerator.MoveNext())
-                        {
-                            var column = columnEnumerator.Current;
-                            var value = valueEnumerator.Current;
-
-                            dataRow[column] = value;
-                        }
-                        dataTable.Rows.Add(dataRow);
-                    }
-
-                    DataGrid1.ItemsSource = dataTable.AsDataView();
+                    editor.LoadFile(fileName);
+                    ContentFrame.Content = _editorPage;
                 }
             }
             catch (Exception ex)
@@ -81,48 +43,24 @@ namespace JsonGridEditor
         {
             try
             {
-                if (_fileName == null)
+                if (_editorPage is IEditor editor)
                 {
-                    var saveFileDialog = new SaveFileDialog();
-                    saveFileDialog.DefaultExt = ".csv";
-                    saveFileDialog.AddExtension = true;
-                    saveFileDialog.Filter = "Csv檔案(*.csv)|*.csv";
-                    //saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                    saveFileDialog.OverwritePrompt = true;
-                    saveFileDialog.CheckPathExists = true;
-                    saveFileDialog.FileName = $"{DateTime.Now.Date:yyyyMMdd}";
-                    var result = saveFileDialog.ShowDialog();
-                    if (result.HasValue && result.Value)
-                    {
-                        _fileName = saveFileDialog.FileName;
-                    }
+                    editor.Save();
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
-                var dataView = DataGrid1.ItemsSource as DataView;
-                var dataTable = dataView?.ToTable();
-                if (_fileName == null || dataTable == null) return;
-
-                using (var stream = new StreamWriter(_fileName))
+        private void ButtonSaveAs_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_editorPage is IEditor editor)
                 {
-                    var columns = new List<string>();
-                    foreach (DataColumn column in dataTable.Columns)
-                    {
-                        var caption = column.Caption;
-                        columns.Add(caption);
-                    }
-
-                    stream.WriteLine(string.Join(",", columns));
-
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        var values = new List<string>();
-                        foreach (var column in columns)
-                        {
-                            values.Add(row[column].ToString());
-                        }
-                        stream.WriteLine(string.Join(",", values));
-                        values.Clear();
-                    }
+                    editor.SaveAs();
                 }
             }
             catch (Exception ex)
@@ -133,72 +71,27 @@ namespace JsonGridEditor
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            return;
-            //_dtos = new ObservableCollection<object>();
-            //_dtos.Add(new Dto() { Value = 1, Data = "1" });
-            //_dtos.Add(new Dto() { Value = 2, Data = "2" });
-            //_dtos.Add(new Dto() { Value = 3, Data = "3" });
-            //DataGrid1.ItemsSource = _dtos;
+        }
 
-            var table = new List<Dictionary<string, string>>();
-            var tableColumn = new List<string>();
-
-            using (var reader = new StreamReader("param.csv"))
+        private void ButtonOpenJson_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
             {
-                var head = reader.ReadLine();
-                tableColumn.AddRange(head.Split(','));
+                var fileName = FileDialog.GetOpenFileName();
 
-                var line = reader.ReadLine();
-                var values = line.Split(',').ToList();
-
-                var headEnumerator = tableColumn.GetEnumerator();
-                var valueEnumerator = values.GetEnumerator();
-
-                var row = new Dictionary<string, string>();
-                while (headEnumerator.MoveNext() && valueEnumerator.MoveNext())
+                if (string.IsNullOrEmpty(fileName) == false)
                 {
-                    var column = headEnumerator.Current;
-                    var value = valueEnumerator.Current;
+                    _editorPage = new JsonEditorPage();
+                    var editor = (IEditor)_editorPage;
 
-                    row.Add(column, value);
+                    editor.LoadFile(fileName);
+                    ContentFrame.Content = _editorPage;
                 }
-                table.Add(row);
             }
-
-            var list = new List<dynamic>();
-
-            foreach (var dictionary in table)
+            catch (Exception ex)
             {
-                var d = new ExpandoObject() as IDictionary<string, object>;
-                foreach (var c in tableColumn)
-                {
-                    d.Add(c, dictionary[c]);
-                }
-
-                list.Add(d);
+                MessageBox.Show(ex.Message);
             }
-
-            var dataTable = new DataTable();
-
-            foreach (var s in tableColumn)
-            {
-                //DataGrid1.Columns.Add(new DataGridTextColumn()
-                //{
-                //    Header = s,
-                //});
-                dataTable.Columns.Add(s);
-            }
-
-            foreach (var d in table)
-            {
-                var dataRow = dataTable.NewRow();
-                foreach (var c in tableColumn)
-                {
-                    dataRow[c] = d[c];
-                }
-                dataTable.Rows.Add(dataRow);
-            }
-            DataGrid1.ItemsSource = dataTable.AsDataView();
         }
     }
 }
