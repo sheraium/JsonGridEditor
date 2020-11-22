@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:JsonGridEditor"
         mc:Ignorable="d"
         Loaded="MainWindow_OnLoaded"
-        FontSize="16"
+        FontSize="16" FontFamily="Consolas"
         Title="Json Grid Editor" Height="650" Width="1000">
     <Grid>
         <Grid.RowDefinitions>

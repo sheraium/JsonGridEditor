@@ -8,7 +8,7 @@
       xmlns:extensions="clr-namespace:JsonGridEditor.Extensions"
       mc:Ignorable="d"
       d:DesignHeight="450" d:DesignWidth="800"
-      FontSize="16"
+      FontSize="16" 
       Loaded="JsonEditorPage_OnLoaded"
       Title="CsvEditorPage">
     <Page.Resources>

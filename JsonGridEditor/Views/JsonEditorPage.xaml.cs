@@ -84,7 +84,7 @@ namespace JsonGridEditor.Views
             {
                 if (_fileName == null || TreeView1.ItemsSource == null) return;
 
-                using var file = new FileStream(_fileName + "_1", FileMode.Create);
+                using var file = new FileStream(_fileName, FileMode.Create);
                 using (var stream = new StreamWriter(file, Encoding.UTF8))
                 {
                     await stream.WriteAsync(_rootJToken.ToString());
@@ -96,71 +96,99 @@ namespace JsonGridEditor.Views
             }
         }
 
-        private void ButtonEdit_OnClick(object sender, RoutedEventArgs e)
+        private static IEnumerable<string> GetColumnNames(JToken selectedToken)
         {
-            try
-            {
-                var selectedToken = TreeView1.SelectedItem as JToken;
-                if (selectedToken == null) return;
-                _selectedTokenPath = selectedToken.Path;
-
-                var tableColumn = new Dictionary<string, object>();
-                foreach (var jToken in selectedToken.Children())
-                {
-                    var jProperty = jToken.ToObject<JProperty>();
-                    tableColumn.Add(jProperty.Name, jProperty.Value);
-                }
-                var dataTable = new DataTable();
-                foreach (var s in tableColumn)
-                {
-                    dataTable.Columns.Add(s.Key);
-                }
-
-                var dataRow = dataTable.NewRow();
-                foreach (var s in tableColumn)
-                {
-                    dataRow[s.Key] = s.Value;
-                }
-                dataTable.Rows.Add(dataRow);
-                DataGrid1.ItemsSource = dataTable.AsDataView();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            return selectedToken.Children()
+                .Where(x => x.Type == JTokenType.Property)
+                .Select(x => x.ToObject<JProperty>().Name);
         }
 
-        private void ButtonSetData_OnClick(object sender, RoutedEventArgs e)
+        private static object GetPropertyValue(JProperty property)
         {
-            try
+            object value = null;
+            switch (property.First.Type)
             {
-                if (_rootJToken == null || string.IsNullOrEmpty(_selectedTokenPath)) return;
-                var selectToken = _rootJToken.SelectToken(_selectedTokenPath);
-                if (selectToken == null) return;
+                case JTokenType.None:
+                    break;
 
-                var dataView = DataGrid1.ItemsSource as DataView;
-                var dataTable = dataView?.ToTable();
-                if (dataTable == null) return;
+                case JTokenType.Object:
+                    break;
 
-                if (selectToken.Type == JTokenType.Object)
+                case JTokenType.Array:
+                    break;
+
+                case JTokenType.Constructor:
+                    break;
+
+                case JTokenType.Property:
+                    break;
+
+                case JTokenType.Comment:
+                    break;
+
+                case JTokenType.Integer:
+                    value = property.Value;
+                    break;
+
+                case JTokenType.Float:
+                    value = property.Value;
+                    break;
+
+                case JTokenType.String:
+                    value = property.Value;
+                    break;
+
+                case JTokenType.Boolean:
+                    value = property.Value;
+                    break;
+
+                case JTokenType.Null:
+                    break;
+
+                case JTokenType.Undefined:
+                    break;
+
+                case JTokenType.Date:
+                    value = property.Value;
+                    break;
+
+                case JTokenType.Raw:
+                    break;
+
+                case JTokenType.Bytes:
+                    break;
+
+                case JTokenType.Guid:
+                    value = property.Value;
+                    break;
+
+                case JTokenType.Uri:
+                    break;
+
+                case JTokenType.TimeSpan:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return value;
+        }
+
+        private static Dictionary<string, object> GetRows(JToken selectedToken)
+        {
+            var rows = new Dictionary<string, object>();
+            foreach (var jToken in selectedToken.Children())
+            {
+                if (jToken.Type == JTokenType.Property)
                 {
-                    var children = selectToken.Children().Select(x => x.ToObject<JProperty>()).ToList();
-
-                    foreach (var jProperty in children)
-                    {
-                        var jToken = selectToken.SelectToken(jProperty.Name);
-                        var newValue = dataTable.Rows[0][jProperty.Name].ToString();
-                        if (jToken == null || newValue == null) continue;
-                        SetJToken(jToken, newValue);
-                    }
+                    var property = jToken.ToObject<JProperty>();
+                    var value = GetPropertyValue(property);
+                    rows.Add(property.Name, value ?? "--NonSupport--");
                 }
+            }
 
-                ResetTreeView(_rootJToken);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            return rows;
         }
 
         private static void SetJToken(JToken jToken, string newValue)
@@ -229,6 +257,113 @@ namespace JsonGridEditor.Views
 
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private static void SetJTokenRow(JToken selectToken, DataRow row)
+        {
+            var children = selectToken.Children().Select(x => x.ToObject<JProperty>()).ToList();
+
+            foreach (var jProperty in children)
+            {
+                var jToken = selectToken.SelectToken(jProperty.Name);
+                var newValue = row[jProperty.Name].ToString();
+                if (jToken == null || newValue == null) continue;
+                SetJToken(jToken, newValue);
+            }
+        }
+
+        private void ButtonEdit_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                DataGrid1.ItemsSource = null;
+
+                var selectedToken = TreeView1.SelectedItem as JToken;
+                if (selectedToken == null) return;
+                _selectedTokenPath = selectedToken.Path;
+
+                if (selectedToken.Type == JTokenType.Object)
+                {
+                    var dataTable = new DataTable();
+                    foreach (var columnName in GetColumnNames(selectedToken))
+                    {
+                        dataTable.Columns.Add(columnName);
+                    }
+
+                    var rows = GetRows(selectedToken);
+                    var dataRow = dataTable.NewRow();
+                    foreach (var row in rows)
+                    {
+                        dataRow[row.Key] = row.Value;
+                    }
+                    dataTable.Rows.Add(dataRow);
+                    DataGrid1.ItemsSource = dataTable.AsDataView();
+                }
+                else if (selectedToken.Type == JTokenType.Array)
+                {
+                    var firstToken = selectedToken.First;
+
+                    var dataTable = new DataTable();
+                    foreach (var columnName in GetColumnNames(firstToken))
+                    {
+                        dataTable.Columns.Add(columnName);
+                    }
+
+                    foreach (var child in selectedToken.Children())
+                    {
+                        var rows = GetRows(child);
+                        var dataRow = dataTable.NewRow();
+                        foreach (var row in rows)
+                        {
+                            dataRow[row.Key] = row.Value;
+                        }
+                        dataTable.Rows.Add(dataRow);
+                    }
+                    DataGrid1.ItemsSource = dataTable.AsDataView();
+                }
+                else
+                {
+                    MessageBox.Show("Select Object or Array.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void ButtonSetData_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_rootJToken == null || string.IsNullOrEmpty(_selectedTokenPath)) return;
+                var selectToken = _rootJToken.SelectToken(_selectedTokenPath);
+                if (selectToken == null) return;
+
+                var dataView = DataGrid1.ItemsSource as DataView;
+                var dataTable = dataView?.ToTable();
+                if (dataTable == null) return;
+
+                if (selectToken.Type == JTokenType.Object)
+                {
+                    SetJTokenRow(selectToken, dataTable.Rows[0]);
+                }
+                else if (selectToken.Type == JTokenType.Array)
+                {
+                    var index = 0;
+                    foreach (var child in selectToken.Children())
+                    {
+                        SetJTokenRow(child, dataTable.Rows[index]);
+                        index++;
+                    }
+                }
+
+                ResetTreeView(_rootJToken);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 
