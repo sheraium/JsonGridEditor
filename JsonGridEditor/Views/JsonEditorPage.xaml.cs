@@ -18,7 +18,8 @@ namespace JsonGridEditor.Views
     public partial class JsonEditorPage : Page, IEditor
     {
         private string _fileName;
-        private JToken _selectedJToken;
+        private JToken _rootJToken;
+        private string _selectedTokenPath;
 
         public JsonEditorPage()
         {
@@ -34,26 +35,9 @@ namespace JsonGridEditor.Views
                 using (var reader = new StreamReader(fileName))
                 {
                     var rawData = await reader.ReadToEndAsync();
-                    var token = JToken.Parse(rawData);
 
-                    var children = new List<JToken>();
-                    if (token != null)
-                    {
-                        children.Add(token);
-                    }
-
-                    TreeView1.ItemsSource = null;
-                    TreeView1.Items.Clear();
-                    TreeView1.ItemsSource = children;
-                    foreach (object item in TreeView1.Items)
-                    {
-                        var treeItem = TreeView1.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
-                        if (treeItem != null)
-                        {
-                            ExpandAll(treeItem, true);
-                            treeItem.IsExpanded = true;
-                        }
-                    }
+                    _rootJToken = JToken.Parse(rawData);
+                    ResetTreeView(_rootJToken);
                 }
             }
             catch (Exception ex)
@@ -66,7 +50,7 @@ namespace JsonGridEditor.Views
         {
             try
             {
-                var fileName1 = string.Empty;
+                var fileName = string.Empty;
                 var saveFileDialog = new SaveFileDialog();
                 saveFileDialog.DefaultExt = ".json";
                 saveFileDialog.AddExtension = true;
@@ -78,10 +62,9 @@ namespace JsonGridEditor.Views
                 var result = saveFileDialog.ShowDialog();
                 if (result.HasValue && result.Value)
                 {
-                    fileName1 = saveFileDialog.FileName;
+                    fileName = saveFileDialog.FileName;
                 }
 
-                var fileName = fileName1;
                 if (string.IsNullOrEmpty(fileName) == false)
                 {
                     _fileName = fileName;
@@ -104,8 +87,7 @@ namespace JsonGridEditor.Views
                 using var file = new FileStream(_fileName + "_1", FileMode.Create);
                 using (var stream = new StreamWriter(file, Encoding.UTF8))
                 {
-                    var root = TreeView1.ItemsSource as List<JToken>;
-                    await stream.WriteAsync(root[0].ToString());
+                    await stream.WriteAsync(_rootJToken.ToString());
                 }
             }
             catch (Exception ex)
@@ -118,12 +100,12 @@ namespace JsonGridEditor.Views
         {
             try
             {
-                _selectedJToken = TreeView1.SelectedItem as JToken;
-                if (_selectedJToken == null) return;
+                var selectedToken = TreeView1.SelectedItem as JToken;
+                if (selectedToken == null) return;
+                _selectedTokenPath = selectedToken.Path;
 
                 var tableColumn = new Dictionary<string, object>();
-
-                foreach (var jToken in _selectedJToken.Children())
+                foreach (var jToken in selectedToken.Children())
                 {
                     var jProperty = jToken.ToObject<JProperty>();
                     tableColumn.Add(jProperty.Name, jProperty.Value);
@@ -150,35 +132,104 @@ namespace JsonGridEditor.Views
 
         private void ButtonSetData_OnClick(object sender, RoutedEventArgs e)
         {
-            return;
-            if (_selectedJToken == null) return;
-
-            var dataView = DataGrid1.ItemsSource as DataView;
-            var dataTable = dataView?.ToTable();
-            if (dataTable == null) return;
-
-            if (_selectedJToken.Type == JTokenType.Object && dataTable.Rows[0] != null)
+            try
             {
-                var children = _selectedJToken.Children().Select(x => x.ToObject<JProperty>()).ToList();
+                if (_rootJToken == null || string.IsNullOrEmpty(_selectedTokenPath)) return;
+                var selectToken = _rootJToken.SelectToken(_selectedTokenPath);
+                if (selectToken == null) return;
 
-                foreach (var jProperty in children)
+                var dataView = DataGrid1.ItemsSource as DataView;
+                var dataTable = dataView?.ToTable();
+                if (dataTable == null) return;
+
+                if (selectToken.Type == JTokenType.Object)
                 {
-                    var json = dataTable.Rows[0][jProperty.Name];
-                    jProperty.Value = JToken.FromObject(json);
+                    var children = selectToken.Children().Select(x => x.ToObject<JProperty>()).ToList();
 
-                    //var jObject = JObject.Parse(json.ToString());
-                    //var jObject = JObject.Parse(_selectedJToken.SelectToken(jProperty.Name).ToString());
-                    //jObject.Replace(json.ToString());
-                    _selectedJToken.SelectToken(jProperty.Name).Replace(jProperty);
+                    foreach (var jProperty in children)
+                    {
+                        var jToken = selectToken.SelectToken(jProperty.Name);
+                        var newValue = dataTable.Rows[0][jProperty.Name].ToString();
+                        if (jToken == null || newValue == null) continue;
+                        SetJToken(jToken, newValue);
+                    }
                 }
+
+                ResetTreeView(_rootJToken);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
 
-            //var token = TreeView1.SelectedItem as List<JToken>;
-            //var jEnumerable = token.Children();
+        private static void SetJToken(JToken jToken, string newValue)
+        {
+            switch (jToken.Type)
+            {
+                case JTokenType.None:
+                    break;
 
-            //var root = TreeView1.ItemsSource as List<JToken>;
-            //var jToken = JToken.Parse(_selectedItem.ToString());
-            //root.Select(jToken);
+                case JTokenType.Object:
+                    break;
+
+                case JTokenType.Array:
+                    break;
+
+                case JTokenType.Constructor:
+                    break;
+
+                case JTokenType.Property:
+                    break;
+
+                case JTokenType.Comment:
+                    break;
+
+                case JTokenType.Integer:
+                    jToken.Replace(new JValue(Convert.ToInt32(newValue)));
+                    break;
+
+                case JTokenType.Float:
+                    jToken.Replace(new JValue(Convert.ToSingle(newValue)));
+                    break;
+
+                case JTokenType.String:
+                    jToken.Replace(new JValue(newValue));
+                    break;
+
+                case JTokenType.Boolean:
+                    jToken.Replace(new JValue(Convert.ToBoolean(newValue)));
+                    break;
+
+                case JTokenType.Null:
+                    break;
+
+                case JTokenType.Undefined:
+                    break;
+
+                case JTokenType.Date:
+                    jToken.Replace(new JValue(Convert.ToDateTime(newValue)));
+                    break;
+
+                case JTokenType.Raw:
+                    break;
+
+                case JTokenType.Bytes:
+                    break;
+
+                case JTokenType.Guid:
+                    jToken.Replace(new JValue(Guid.Parse(newValue)));
+                    break;
+
+                case JTokenType.Uri:
+                    break;
+
+                case JTokenType.TimeSpan:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void ExpandAll(ItemsControl items, bool expand)
@@ -198,6 +249,28 @@ namespace JsonGridEditor.Views
 
         private void JsonEditorPage_OnLoaded(object sender, RoutedEventArgs e)
         {
+        }
+
+        private void ResetTreeView(JToken token)
+        {
+            var children = new List<JToken>();
+            if (token != null)
+            {
+                children.Add(token);
+            }
+
+            TreeView1.ItemsSource = null;
+            TreeView1.Items.Clear();
+            TreeView1.ItemsSource = children;
+            foreach (object item in TreeView1.Items)
+            {
+                var treeItem = TreeView1.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                if (treeItem != null)
+                {
+                    ExpandAll(treeItem, true);
+                    treeItem.IsExpanded = true;
+                }
+            }
         }
     }
 }
